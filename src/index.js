@@ -301,7 +301,13 @@ app.post('/signin', async(req, res) => {
 //     }).catch((error) => {
 //         res.status(400).send(error)
 //     })
-
+// user.todos.push({description: req.body.description}).then(() => {
+    //     user.save().then(() => {
+    //         res.send(user)
+    //     })
+    // }).catch((error) => {
+    //     res.status(400).send(error)
+    // })
 // });
 
 app.post('/addtodo', (req, res) => {
@@ -317,14 +323,6 @@ app.post('/addtodo', (req, res) => {
     }).catch((e) => {
         res.send(e)
     })
-    // user.todos.push({description: req.body.description}).then(() => {
-    //     user.save().then(() => {
-    //         res.send(user)
-    //     })
-    // }).catch((error) => {
-    //     res.status(400).send(error)
-    // })
-
 });
 
 app.put('/checktodo', (req, res) => {
@@ -342,25 +340,44 @@ app.put('/checktodo', (req, res) => {
  });
 
 app.put('/updatetodo', (req, res) => {
-    userModel.findById({"todos._id": req.body.todoid}).then((todo) => {
-        console.log(todo)
-    }).catch((e) => {
-        console.log(e)
-    })
+    // userModel.findById({"todos._id": req.body.todoid}).then((todo) => {
+    //     console.log(todo)
+    // }).catch((e) => {
+    //     console.log(e)
+    // })
  });
 
  app.put('/deletetodo', (req, res) => {
      console.log(req.body)
-     res.send('delete')
-    userModel.find({todos:{"_id": req.body.todoid}}, (err, todo) => {
-        if (err) {
-            res.send(err)
-            console.log(err)
-        } else {
-            res.send(todo)
-            console.log(todo)
-        }
+     const todoid = req.body.todoid
+     const userid = req.body.userid
+    // userModel.find({todos:{"_id": req.body.todoid}}, (err, todo) => {
+    //     if (err) {
+    //         res.send(err)
+    //         console.log(err)
+    //     } else {
+    //         res.send(todo)
+    //         console.log(todo)
+    //     }
+    // })
+    userModel.findById(userid).then((user) => {
+        // user.todos.map((todo) => {
+        //     console.log(todo._id)
+        //     if (todo._id === req.body.todoid) {
+        //         console.log('found')
+        //     }
+        // })
+        user.todos.forEach((todo) => {
+            console.log(todo._id)
+            if (todo._id === todoid) {
+                console.log('found')
+            }
+        })
+        res.send(user)
+    }).catch((e) => {
+        res.send(e)
     })
+ 
 });
 
 // , (err, todo) => {
