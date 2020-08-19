@@ -43,8 +43,6 @@ const todoSchema = new Schema({
     }
 })
 
-const todoModel = mongoose.model('todo', todoSchema)
-
 const userSchema = new Schema(    {
     name: {
         type: String,

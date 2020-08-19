@@ -7,7 +7,9 @@ const User = require('./models/user');
 const Todo = require('./models/todo');
 // const mongoose = require('./db/mongodb');
 const { db, todoModel, userModel } = require('./models/usertodo');
-
+// const { MongoClient, ObjectID } = require('mongodb');
+// const { Mongoose } = require('mongoose');
+const mongoose = require('mongoose')
 
 const app = new express();
 
@@ -314,7 +316,7 @@ app.post('/addtodo', (req, res) => {
     const description = req.body.description
     const todo = new todoModel(description);
     userModel.findById(req.body.userid).then((user) => {
-        todo.save()
+        // todo.save()
         user.todos.push(todo)
         user.save()
         res.send(user)
@@ -346,11 +348,73 @@ app.put('/updatetodo', (req, res) => {
  });
 
 app.put('/deletetodo', (req, res) => {
-     console.log(req.body)
-     const todoid = req.body.todoid
-     const userid = req.body.userid
-    
-    // userModel.findById(userid, (err, user) => {
+    console.log(req.body)    
+    userModel.findOneAndUpdate({_id: req.body.userid}, {
+        $pull: {'todos._id': mongoose.Types.ObjectId(req.body.todoid)}    
+    }, {new: true}).then((r) => {
+        console.log(r)
+    }).catch((e) => {
+        console.log(e)
+        res.send(e)
+    })
+});
+
+app.get('/getuser', (req, res) => {
+    const id = req.body.id
+    db.collection('users').findOne({_id: mongoose.Types.ObjectId(todoid)}, (error, user) => {
+        if (error) {
+            return console.log('Unable to find the user')
+        }
+        console.log(user);
+
+        res.send(user)
+    })
+})
+
+// userModel.findById(userid, (err, user) => {
+//     if (err) {
+//         console.log(err)
+//     }
+//     console.log(user)
+//     const indexOfTodo = user.todos.map((todo) => {
+//         // console.log(todo._id)
+//         if(todoid == todo._id) {
+//             // console.log(todo)
+//             todo.description = ""
+//             return todo._id
+            
+//         }
+//    })
+//     user.save()
+//     console.log(userModel.todos)
+//     console.log(indexOfTodo[0])
+//     // userModel.findByIdAndDelete({"todos._id": indexOfTodo[0]}).then((result) => {
+//     //     console.log(result)
+//     // })
+// })
+// res.send('success')
+
+// userModel.find({_id: userid}).then((user) => {
+//     console.log(user)
+
+//     // user[0].todos.find({_id: todoid}).then((todo) => {
+//     //     console.log(todo)
+//     // }).catch((e) => console.log(e))
+//     user[0].todos.map((todo) => {
+//         console.log(todo._id)
+//         if (user[0].todo._id === todoid) {
+//             console.log('found')
+//         }
+//     })
+//     console.log(user.todos)
+//     todoModel.find({_id: todoid}).then((todo) => {
+//         console.log(todo)
+//     })
+//     res.send(user.todos)
+// }).catch((e) => {
+//     res.send(e)
+// })
+   // userModel.findById(userid, (err, user) => {
     //     if (err) {
     //         // res.send(err)
     //         console.log(err)
@@ -369,61 +433,6 @@ app.put('/deletetodo', (req, res) => {
 
     //     }
     // })
-
-    userModel.findById(userid, (err, user) => {
-        if (err) {
-            console.log(err)
-        }
-        console.log(user)
-        const indexOfTodo = user.todos.map((todo) => {
-            // console.log(todo._id)
-            if(todoid == todo._id) {
-                // console.log(todo)
-                return todo._id
-                
-            }
-        })
-        console.log(indexOfTodo[0])
-        userModel.todos.findByIdAndDelete({_id: indexOfTodo[0]}).then((result) => {
-            console.log(result)
-        })
-    })
-    res.send('success')
-
-    // userModel.find({_id: userid}).then((user) => {
-    //     console.log(user)
-
-    //     // user[0].todos.find({_id: todoid}).then((todo) => {
-    //     //     console.log(todo)
-    //     // }).catch((e) => console.log(e))
-    //     user[0].todos.map((todo) => {
-    //         console.log(todo._id)
-    //         if (user[0].todo._id === todoid) {
-    //             console.log('found')
-    //         }
-    //     })
-    //     console.log(user.todos)
-    //     todoModel.find({_id: todoid}).then((todo) => {
-    //         console.log(todo)
-    //     })
-    //     res.send(user.todos)
-    // }).catch((e) => {
-    //     res.send(e)
-    // })
- 
-});
-
-app.get('/getuser', (req, res) => {
-    const id = req.body.id
-    db.collection('users').findOne({_id: ObjectID(id)}, (error, user) => {
-        if (error) {
-            return console.log('Unable to find the user')
-        }
-        console.log(user);
-
-        res.send(user)
-    })
-})
 
 
 // user[0].todos.find({_id: todoid}).then((todo) => {
