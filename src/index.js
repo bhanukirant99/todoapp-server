@@ -5,8 +5,8 @@ const cors = require('cors');
 // const database = require('./src/models/user');
 const User = require('./models/user');
 const Todo = require('./models/todo');
-const mongoose = require('./db/mongodb');
-const { todoModel, userModel } = require('./models/usertodo');
+// const mongoose = require('./db/mongodb');
+const { db, todoModel, userModel } = require('./models/usertodo');
 
 
 const app = new express();
@@ -313,10 +313,8 @@ app.post('/signin', async(req, res) => {
 app.post('/addtodo', (req, res) => {
     const description = req.body.description
     const todo = new todoModel(description);
-    console.log(description)
-    console.log(req.body)
-
     userModel.findById(req.body.userid).then((user) => {
+        todo.save()
         user.todos.push(todo)
         user.save()
         res.send(user)
@@ -347,39 +345,90 @@ app.put('/updatetodo', (req, res) => {
     // })
  });
 
- app.put('/deletetodo', (req, res) => {
+app.put('/deletetodo', (req, res) => {
      console.log(req.body)
      const todoid = req.body.todoid
      const userid = req.body.userid
-    // userModel.find({todos:{"_id": req.body.todoid}}, (err, todo) => {
+    
+    // userModel.findById(userid, (err, user) => {
     //     if (err) {
-    //         res.send(err)
+    //         // res.send(err)
     //         console.log(err)
     //     } else {
-    //         res.send(todo)
-    //         console.log(todo)
+    //         console.log(user)
+    //         user.todos.map((todos) => {
+    //             console.log(todos)
+    //             if (todoid === todo._id) {
+    //                 // todoid = todo._id
+    //                 console.log(todo)
+    //                 console.log('success')
+
+    //             }
+    //         })
+    //         res.send(user)
+
     //     }
     // })
-    userModel.findById(userid).then((user) => {
-        // user.todos.map((todo) => {
-        //     console.log(todo._id)
-        //     if (todo._id === req.body.todoid) {
-        //         console.log('found')
-        //     }
-        // })
-        user.todos.forEach((todo) => {
-            console.log(todo._id)
-            if (todo._id === todoid) {
-                console.log('found')
+
+    userModel.findById(userid, (err, user) => {
+        if (err) {
+            console.log(err)
+        }
+        console.log(user)
+        const indexOfTodo = user.todos.map((todo) => {
+            // console.log(todo._id)
+            if(todoid == todo._id) {
+                // console.log(todo)
+                return todo._id
+                
             }
         })
-        res.send(user)
-    }).catch((e) => {
-        res.send(e)
+        console.log(indexOfTodo[0])
+        userModel.todos.findByIdAndDelete({_id: indexOfTodo[0]}).then((result) => {
+            console.log(result)
+        })
     })
+    res.send('success')
+
+    // userModel.find({_id: userid}).then((user) => {
+    //     console.log(user)
+
+    //     // user[0].todos.find({_id: todoid}).then((todo) => {
+    //     //     console.log(todo)
+    //     // }).catch((e) => console.log(e))
+    //     user[0].todos.map((todo) => {
+    //         console.log(todo._id)
+    //         if (user[0].todo._id === todoid) {
+    //             console.log('found')
+    //         }
+    //     })
+    //     console.log(user.todos)
+    //     todoModel.find({_id: todoid}).then((todo) => {
+    //         console.log(todo)
+    //     })
+    //     res.send(user.todos)
+    // }).catch((e) => {
+    //     res.send(e)
+    // })
  
 });
 
+app.get('/getuser', (req, res) => {
+    const id = req.body.id
+    db.collection('users').findOne({_id: ObjectID(id)}, (error, user) => {
+        if (error) {
+            return console.log('Unable to find the user')
+        }
+        console.log(user);
+
+        res.send(user)
+    })
+})
+
+
+// user[0].todos.find({_id: todoid}).then((todo) => {
+//     console.log(todo)
+// }).catch((e) => console.log(e))
 // , (err, todo) => {
 //     if (err) {
 //         res.send(err)
