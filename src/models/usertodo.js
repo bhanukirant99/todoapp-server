@@ -65,6 +65,8 @@ const userSchema = new Schema(    {
 })
 
 const userModel = mongoose.model('user', userSchema)
+const todoModel = mongoose.model('todo', todoSchema)
+
 
 
 // const user = new userModel({
@@ -85,6 +87,6 @@ const userModel = mongoose.model('user', userSchema)
 
 module.exports = {
     userModel,
-    todoModel,
+    todoModel
 };
 

@@ -7,9 +7,39 @@ const User = require('./models/user');
 const Todo = require('./models/todo');
 // const mongoose = require('./db/mongodb');
 const { db, todoModel, userModel } = require('./models/usertodo');
-// const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 // const { Mongoose } = require('mongoose');
 const mongoose = require('mongoose')
+
+const connectionURL = 'mongodb://127.0.0.1:27017';
+const databaseName = 'todo-app';
+
+MongoClient.connect(connectionURL, {useNewUrlParser: true}, (error, client) => {
+    if (error) {
+        return console.log('Unable to connect ot the database');
+    }
+
+    const db = client.db(databaseName);
+    db.collection('users').findOne(
+        {_id: ObjectID("5f3db54af8d564023dcbfcaf")}
+    ).then((user) => {
+        console.log(user)
+        const todos = user.todos.map((todo) => {
+            // console.log(todo._id)
+            if('5f3db551f8d564023dcbfcb0' != todo._id) {
+                return todo
+                console.log(todo)
+            }
+       })
+       console.log(todos)
+       user({ todos: {
+            $set: todos
+       }
+       })
+    }).catch((e) => {
+        console.log(e)
+    })
+})
 
 const app = new express();
 
@@ -313,10 +343,9 @@ app.post('/signin', async(req, res) => {
 // });
 
 app.post('/addtodo', (req, res) => {
-    const description = req.body.description
-    const todo = new todoModel(description);
+    const todo = new todoModel(req.body.description);
     userModel.findById(req.body.userid).then((user) => {
-        // todo.save()
+        todo.save()
         user.todos.push(todo)
         user.save()
         res.send(user)
@@ -349,13 +378,20 @@ app.put('/updatetodo', (req, res) => {
 
 app.put('/deletetodo', (req, res) => {
     console.log(req.body)    
-    userModel.findOneAndUpdate({_id: req.body.userid}, {
-        $pull: {'todos._id': mongoose.Types.ObjectId(req.body.todoid)}    
-    }, {new: true}).then((r) => {
-        console.log(r)
-    }).catch((e) => {
-        console.log(e)
-        res.send(e)
+    userModel.findById(req.body.userid, (err, user) => {
+        if (err) {
+            console.log(err)
+        }
+        console.log(user)
+        const todos = user.todos.map((todo) => {
+            // console.log(todo._id)
+            if(req.body.todoid != todo._id) {
+                console.log(todo)
+            }
+       })
+    //    user.update(
+    //        $set: {todos: todos}
+    //     )
     })
 });
 
@@ -370,6 +406,15 @@ app.get('/getuser', (req, res) => {
         res.send(user)
     })
 })
+
+// userModel.findOneAndUpdate({_id: req.body.userid}, {
+//     $pull: {'todos._id': mongoose.Types.ObjectId(req.body.todoid)}    
+// }, {new: true}).then((r) => {
+//     console.log(r)
+// }).catch((e) => {
+//     console.log(e)
+//     res.send(e)
+// })
 
 // userModel.findById(userid, (err, user) => {
 //     if (err) {

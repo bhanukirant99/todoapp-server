@@ -1,9 +1,12 @@
 {
   "name": "facedetectionapp_api",
   "version": "1.0.0",
+  "homepage": "https://bhanukirant99.github.io/todoapp-server",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "author": "",
   "license": "ISC",
