@@ -7,7 +7,8 @@ const { MongoClient, ObjectID } = require('mongodb');
 // const connectionURL = 'mongodb://127.0.0.1:27017';
 // const databaseName = 'todo-app';
 
-mongoose.connect('mongodb://127.0.0.1:27017/todo-app', {
+
+mongoose.connect('mongodb://127.0.0.1:27017/todo=app', {
     useNewUrlParser: true,
     useCreateIndex: true
 })
@@ -38,6 +39,10 @@ const todoSchema = new Schema({
         type: String,
     },
     completed: {
+        type: Boolean,
+        default: false
+    },
+    deleted: {
         type: Boolean,
         default: false
     }

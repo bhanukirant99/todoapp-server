@@ -14,32 +14,32 @@ const mongoose = require('mongoose')
 const connectionURL = 'mongodb://127.0.0.1:27017';
 const databaseName = 'todo-app';
 
-MongoClient.connect(connectionURL, {useNewUrlParser: true}, (error, client) => {
-    if (error) {
-        return console.log('Unable to connect ot the database');
-    }
+// MongoClient.connect(connectionURL, {useNewUrlParser: true}, (error, client) => {
+//     if (error) {
+//         return console.log('Unable to connect ot the database');
+//     }
 
-    const db = client.db(databaseName);
-    db.collection('users').findOne(
-        {_id: ObjectID("5f3db54af8d564023dcbfcaf")}
-    ).then((user) => {
-        console.log(user)
-        const todos = user.todos.map((todo) => {
-            // console.log(todo._id)
-            if('5f3db551f8d564023dcbfcb0' != todo._id) {
-                return todo
-                console.log(todo)
-            }
-       })
-       console.log(todos)
-       user({ todos: {
-            $set: todos
-       }
-       })
-    }).catch((e) => {
-        console.log(e)
-    })
-})
+//     const db = client.db(databaseName);
+//     db.collection('users').findOne(
+//         {_id: ObjectID("5f3db54af8d564023dcbfcaf")}
+//     ).then((user) => {
+//         console.log(user)
+//         const todos = user.todos.map((todo) => {
+//             // console.log(todo._id)
+//             if('5f3db551f8d564023dcbfcb0' != todo._id) {
+//                 return todo
+//                 console.log(todo)
+//             }
+//        })
+//        console.log(todos)
+//        user({ todos: {
+//             $set: todos
+//        }
+//        })
+//     }).catch((e) => {
+//         console.log(e)
+//     })
+// })
 
 const app = new express();
 
@@ -383,7 +383,7 @@ app.put('/deletetodo', (req, res) => {
             console.log(err)
         }
         console.log(user)
-        const todos = user.todos.map((todo) => {
+        user.todos.map((todo) => {
             // console.log(todo._id)
             if(req.body.todoid != todo._id) {
                 console.log(todo)
@@ -393,6 +393,28 @@ app.put('/deletetodo', (req, res) => {
     //        $set: {todos: todos}
     //     )
     })
+    // userModel.findOne({_id : req.body.userid},(err,foundUser) => {
+    //     console.log(foundUser)
+
+    //     var foundTodos = foundUser.todos;
+    //         foundTodos.forEach(todo => {
+                  
+    //           if(todo._id === req.body.todoid){
+                
+                
+    //             console.log(todo);
+                
+    //             todo.items.remove(item);
+    //             foundUser.save();
+    //         res.redirect("/")
+    //           }else{
+    //             console.log("Why the fuck isn't it working?");
+                
+    //           }
+              
+    //         }); 
+    
+    //   })
 });
 
 app.get('/getuser', (req, res) => {
